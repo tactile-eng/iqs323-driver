@@ -31,6 +31,7 @@ device_driver::implement_device!(
     impl<'a, D, const BASE_ADDR: u8> ChannelSetup<'a, D, BASE_ADDR> {
         register Setup {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x00;
             const SIZE_BITS: usize = 16;
 
@@ -44,6 +45,7 @@ device_driver::implement_device!(
         },
         register ProxSettings {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x01;
             const SIZE_BITS: usize = 16;
 
@@ -53,6 +55,7 @@ device_driver::implement_device!(
         },
         register TouchSettings {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x02;
             const SIZE_BITS: usize = 16;
 
@@ -61,6 +64,7 @@ device_driver::implement_device!(
         },
         register FollowerWeight {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x03;
             const SIZE_BITS: usize = 16;
 
@@ -74,6 +78,7 @@ device_driver::implement_device!(
     impl<'a, D, const BASE_ADDR: u8> ChannelSetup<'a, D, BASE_ADDR> {
         register MovementUiSettings {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x04;
             const SIZE_BITS: usize = 16;
 

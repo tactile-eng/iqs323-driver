@@ -16,6 +16,7 @@ device_driver::implement_device!(
     impl<'a, D> I2cSettings<'a, D> {
         register Settings {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0xe0;
             const SIZE_BITS: usize = 16;
 
@@ -24,6 +25,7 @@ device_driver::implement_device!(
         },
         register HardwareId {
             type RWType = ReadOnly;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0xe1;
             const SIZE_BITS: usize = 16;
 

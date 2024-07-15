@@ -19,6 +19,7 @@ cfg_if::cfg_if! {
             impl<D> Iqs323<D> {
                 register Version {
                     type RWType = ReadOnly;
+                    type ByteOrder = LE;
                     const ADDRESS: u8 = 0;
                     const SIZE_BITS: usize = 48;
                     const RESET_VALUE: [u8] = [0xb6, 0x05, 0x01, 0x00, 0x04, 0x00];
@@ -34,6 +35,7 @@ cfg_if::cfg_if! {
             impl<D> Iqs323<D> {
                 register Version {
                     type RWType = ReadOnly;
+                    type ByteOrder = LE;
                     const ADDRESS: u8 = 0;
                     const SIZE_BITS: usize = 48;
                     const RESET_VALUE: [u8] = [0x52, 0x04, 0x01, 0x00, 0x03, 0x00];
@@ -51,6 +53,7 @@ device_driver::implement_device!(
     impl<'a, D> SysInfo<'a, D> {
         register SystemStatus {
             type RWType = ReadOnly;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x10;
             const SIZE_BITS: usize = 16;
 
@@ -77,6 +80,7 @@ device_driver::implement_device!(
         },
         register Gestures {
             type RWType = ReadOnly;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x11;
             const SIZE_BITS: usize = 16;
 
@@ -91,6 +95,7 @@ device_driver::implement_device!(
         },
         register SliderPosition {
             type RWType = ReadOnly;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x12;
             const SIZE_BITS: usize = 16;
 
@@ -98,6 +103,7 @@ device_driver::implement_device!(
         },
         register Ch0FilteredCounts {
             type RWType = ReadOnly;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x13;
             const SIZE_BITS: usize = 16;
 
@@ -105,6 +111,7 @@ device_driver::implement_device!(
         },
         register Ch0Lta {
             type RWType = ReadOnly;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x14;
             const SIZE_BITS: usize = 16;
 
@@ -112,6 +119,7 @@ device_driver::implement_device!(
         },
         register Ch1FilteredCounts {
             type RWType = ReadOnly;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x15;
             const SIZE_BITS: usize = 16;
 
@@ -119,6 +127,7 @@ device_driver::implement_device!(
         },
         register Ch1Lta {
             type RWType = ReadOnly;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x16;
             const SIZE_BITS: usize = 16;
 
@@ -126,6 +135,7 @@ device_driver::implement_device!(
         },
         register Ch2FilteredCounts {
             type RWType = ReadOnly;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x17;
             const SIZE_BITS: usize = 16;
 
@@ -133,6 +143,7 @@ device_driver::implement_device!(
         },
         register Ch2Lta {
             type RWType = ReadOnly;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x18;
             const SIZE_BITS: usize = 16;
 

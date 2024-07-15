@@ -16,6 +16,7 @@ device_driver::implement_device!(
     impl<'a, D> GestureConfig<'a, D> {
         register GestureEnable {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0xa0;
             const SIZE_BITS: usize = 16;
 
@@ -26,6 +27,7 @@ device_driver::implement_device!(
         },
         register MinimumGestureTime {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0xa1;
             const SIZE_BITS: usize = 16;
 
@@ -33,6 +35,7 @@ device_driver::implement_device!(
         },
         register MaximumTapTime {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0xa2;
             const SIZE_BITS: usize = 16;
 
@@ -40,6 +43,7 @@ device_driver::implement_device!(
         },
         register MaximumSwipeTime {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0xa3;
             const SIZE_BITS: usize = 16;
 
@@ -47,6 +51,7 @@ device_driver::implement_device!(
         },
         register MinimumHoldTime {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0xa4;
             const SIZE_BITS: usize = 16;
 
@@ -54,6 +59,7 @@ device_driver::implement_device!(
         },
         register MaximumTapDistance {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0xa5;
             const SIZE_BITS: usize = 16;
 
@@ -61,6 +67,7 @@ device_driver::implement_device!(
         },
         register MinimumSwipeDistance {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0xa6;
             const SIZE_BITS: usize = 16;
 

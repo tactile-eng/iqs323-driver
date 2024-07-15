@@ -18,6 +18,7 @@ device_driver::implement_device!(
     impl<D> Iqs323<D> {
         register Ch0MovementLta {
             type RWType = ReadOnly;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x20;
             const SIZE_BITS: usize = 16;
 
@@ -25,6 +26,7 @@ device_driver::implement_device!(
         },
         register Ch1MovementLta {
             type RWType = ReadOnly;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x21;
             const SIZE_BITS: usize = 16;
 
@@ -32,6 +34,7 @@ device_driver::implement_device!(
         },
         register Ch2MovementLta {
             type RWType = ReadOnly;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x22;
             const SIZE_BITS: usize = 16;
 
@@ -39,6 +42,7 @@ device_driver::implement_device!(
         },
         register MovementStatus {
             type RWType = ReadOnly;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x23;
             const SIZE_BITS: usize = 16;
 

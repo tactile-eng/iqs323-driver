@@ -16,6 +16,7 @@ device_driver::implement_device!(
     impl<'a, D> SysControl<'a, D> {
         register Control {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0xc0;
             const SIZE_BITS: usize = 16;
 
@@ -41,6 +42,7 @@ device_driver::implement_device!(
         },
         register NormalPowerReportRate {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0xc1;
             const SIZE_BITS: usize = 16;
 
@@ -48,6 +50,7 @@ device_driver::implement_device!(
         },
         register LowPowerReportRate {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0xc2;
             const SIZE_BITS: usize = 16;
 
@@ -55,6 +58,7 @@ device_driver::implement_device!(
         },
         register UltraLowPowerReportRate {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0xc3;
             const SIZE_BITS: usize = 16;
 
@@ -62,6 +66,7 @@ device_driver::implement_device!(
         },
         register HaltReportRate {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0xc4;
             const SIZE_BITS: usize = 16;
 
@@ -69,6 +74,7 @@ device_driver::implement_device!(
         },
         register PowerModeTimeout {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0xc5;
             const SIZE_BITS: usize = 16;
 

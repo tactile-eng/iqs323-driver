@@ -16,6 +16,7 @@ device_driver::implement_device!(
     impl<'a, D> General<'a, D> {
         register OutAMask {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0xd0;
             const SIZE_BITS: usize = 16;
 
@@ -23,6 +24,7 @@ device_driver::implement_device!(
         },
         register TransactionTimeout {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0xd1;
             const SIZE_BITS: usize = 16;
 
@@ -30,6 +32,7 @@ device_driver::implement_device!(
         },
         register EventTimeouts {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0xd2;
             const SIZE_BITS: usize = 16;
 
@@ -45,6 +48,7 @@ cfg_if::cfg_if! {
             impl<'a, D> General<'a, D> {
                 register EventsEnable {
                     type RWType = ReadWrite;
+                    type ByteOrder = LE;
                     const ADDRESS: u8 = 0xd3;
                     const SIZE_BITS: usize = 16;
 
@@ -57,6 +61,7 @@ cfg_if::cfg_if! {
                 },
                 register MovementTimeout {
                     type RWType = ReadWrite;
+                    type ByteOrder = LE;
                     const ADDRESS: u8 = 0xd4;
                     const SIZE_BITS: usize = 16;
 
@@ -69,6 +74,7 @@ cfg_if::cfg_if! {
             impl<'a, D> General<'a, D> {
                 register EventsEnable {
                     type RWType = ReadWrite;
+                    type ByteOrder = LE;
                     const ADDRESS: u8 = 0xd3;
                     const SIZE_BITS: usize = 16;
 
@@ -82,6 +88,7 @@ cfg_if::cfg_if! {
                 },
                 register ReleaseUiSettings {
                     type RWType = ReadWrite;
+                    type ByteOrder = LE;
                     const ADDRESS: u8 = 0xd4;
                     const SIZE_BITS: usize = 16;
 

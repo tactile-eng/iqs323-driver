@@ -18,6 +18,7 @@ device_driver::implement_device!(
     impl<'a, D> ReleaseUi<'a, D> {
         register Ch0ActivationLta {
             type RWType = ReadOnly;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x20;
             const SIZE_BITS: usize = 16;
 
@@ -25,6 +26,7 @@ device_driver::implement_device!(
         },
         register Ch1ActivationLta {
             type RWType = ReadOnly;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x21;
             const SIZE_BITS: usize = 16;
 
@@ -32,6 +34,7 @@ device_driver::implement_device!(
         },
         register Ch2ActivationLta {
             type RWType = ReadOnly;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x22;
             const SIZE_BITS: usize = 16;
 
@@ -39,6 +42,7 @@ device_driver::implement_device!(
         },
         register Ch0DeltaSnapshot {
             type RWType = ReadOnly;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x23;
             const SIZE_BITS: usize = 16;
 
@@ -46,6 +50,7 @@ device_driver::implement_device!(
         },
         register Ch1DeltaSnapshot {
             type RWType = ReadOnly;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x24;
             const SIZE_BITS: usize = 16;
 
@@ -53,6 +58,7 @@ device_driver::implement_device!(
         },
         register Ch2DeltaSnapshot {
             type RWType = ReadOnly;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x25;
             const SIZE_BITS: usize = 16;
 

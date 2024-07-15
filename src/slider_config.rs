@@ -16,6 +16,7 @@ device_driver::implement_device!(
     impl<'a, D> SliderConfig<'a, D> {
         register SliderSetup {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x90;
             const SIZE_BITS: usize = 16;
 
@@ -29,6 +30,7 @@ device_driver::implement_device!(
         },
         register SliderBottomSpeed {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x91;
             const SIZE_BITS: usize = 16;
 
@@ -37,6 +39,7 @@ device_driver::implement_device!(
         },
         register SliderTopSpeed {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x92;
             const SIZE_BITS: usize = 16;
 
@@ -44,6 +47,7 @@ device_driver::implement_device!(
         },
         register SliderResolution {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x93;
             const SIZE_BITS: usize = 16;
 
@@ -51,6 +55,7 @@ device_driver::implement_device!(
         },
         register SliderEnableMask {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x94;
             const SIZE_BITS: usize = 16;
 
@@ -60,6 +65,7 @@ device_driver::implement_device!(
         },
         register DeltaLink0 {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x96;
             const SIZE_BITS: usize = 16;
 
@@ -67,6 +73,7 @@ device_driver::implement_device!(
         },
         register DeltaLink1 {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x96;
             const SIZE_BITS: usize = 16;
 
@@ -74,6 +81,7 @@ device_driver::implement_device!(
         },
         register DeltaLink2 {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x96;
             const SIZE_BITS: usize = 16;
 
@@ -88,6 +96,7 @@ cfg_if::cfg_if! {
             impl<'a, D> SliderConfig<'a, D> {
                 register SliderEnableStatusPointer {
                     type RWType = ReadWrite;
+                    type ByteOrder = LE;
                     const ADDRESS: u8 = 0x95;
                     const SIZE_BITS: usize = 16;
                     const RESET_VALUE: u16 = 0x552;
@@ -110,6 +119,7 @@ cfg_if::cfg_if! {
             impl<'a, D> SliderConfig<'a, D> {
                 register SliderEnableStatusPointer {
                     type RWType = ReadWrite;
+                    type ByteOrder = LE;
                     const ADDRESS: u8 = 0x95;
                     const SIZE_BITS: usize = 16;
                     const RESET_VALUE: u16 = 0x558;

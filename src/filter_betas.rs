@@ -16,6 +16,7 @@ device_driver::implement_device!(
     impl<'a, D> FilterBetas<'a, D> {
         register Counts {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0xb0;
             const SIZE_BITS: usize = 16;
 
@@ -24,6 +25,7 @@ device_driver::implement_device!(
         },
         register Lta {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0xb1;
             const SIZE_BITS: usize = 16;
 
@@ -32,6 +34,7 @@ device_driver::implement_device!(
         },
         register LtaFast {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0xb2;
             const SIZE_BITS: usize = 16;
 
@@ -40,6 +43,7 @@ device_driver::implement_device!(
         },
         register FastFilterBand {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0xb4;
             const SIZE_BITS: usize = 16;
 
@@ -54,6 +58,7 @@ cfg_if::cfg_if! {
             impl<'a, D> FilterBetas<'a, D> {
                 register MovementLta {
                     type RWType = ReadWrite;
+                    type ByteOrder = LE;
                     const ADDRESS: u8 = 0xb3;
                     const SIZE_BITS: usize = 16;
 
@@ -67,6 +72,7 @@ cfg_if::cfg_if! {
             impl<'a, D> FilterBetas<'a, D> {
                 register ActivationLta {
                     type RWType = ReadWrite;
+                    type ByteOrder = LE;
                     const ADDRESS: u8 = 0xb3;
                     const SIZE_BITS: usize = 16;
 

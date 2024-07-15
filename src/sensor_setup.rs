@@ -31,6 +31,7 @@ device_driver::implement_device!(
     impl<'a, D, const BASE_ADDR: u8> SensorSetup<'a, D, BASE_ADDR> {
         register Setup {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x00;
             const SIZE_BITS: usize = 16;
 
@@ -50,6 +51,7 @@ device_driver::implement_device!(
         },
         register ConversionFrequency {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x01;
             const SIZE_BITS: usize = 16;
 
@@ -58,6 +60,7 @@ device_driver::implement_device!(
         },
         register ProxControl {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x02;
             const SIZE_BITS: usize = 16;
 
@@ -88,6 +91,7 @@ device_driver::implement_device!(
         },
         register ProxInput {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x03;
             const SIZE_BITS: usize = 16;
             const RESET_VALUE: u16 = 0x0083;
@@ -108,6 +112,7 @@ device_driver::implement_device!(
         },
         register PatternDefinitions {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x04;
             const SIZE_BITS: usize = 16;
 
@@ -123,6 +128,7 @@ device_driver::implement_device!(
         },
         register PatternSelectionAndEngineBiasCurrent {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x05;
             const SIZE_BITS: usize = 16;
 
@@ -132,6 +138,7 @@ device_driver::implement_device!(
         },
         register AtiSetup {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x06;
             const SIZE_BITS: usize = 16;
 
@@ -150,6 +157,7 @@ device_driver::implement_device!(
         },
         register AtiBase {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x07;
             const SIZE_BITS: usize = 16;
 
@@ -157,6 +165,7 @@ device_driver::implement_device!(
         },
         register AtiMultipliers {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x08;
             const SIZE_BITS: usize = 16;
 
@@ -167,6 +176,7 @@ device_driver::implement_device!(
         },
         register Compensation {
             type RWType = ReadWrite;
+            type ByteOrder = LE;
             const ADDRESS: u8 = 0x09;
             const SIZE_BITS: usize = 16;
 
