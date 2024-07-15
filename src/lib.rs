@@ -7,7 +7,7 @@ use core::marker::PhantomData;
 
 use bitvec::array::BitArray;
 use device_driver::{bitvec, AsyncRegisterDevice, RegisterDevice};
-use embedded_hal::i2c::{I2c, Operation};
+use embedded_hal::i2c::I2c;
 use embedded_hal_async::i2c::I2c as AsyncI2c;
 
 pub mod channel_setup;
@@ -46,13 +46,9 @@ impl<D: I2c> RegisterDevice for Iqs323<D> {
     where
         R: device_driver::Register<SIZE_BYTES, AddressType = Self::AddressType>,
     {
-        self.i2c.transaction(
-            ADDR,
-            &mut [
-                Operation::Write(&[R::ADDRESS]),
-                Operation::Write(data.as_raw_slice()),
-            ],
-        )
+        const { core::assert!(SIZE_BYTES == 2) };
+        let buf = [R::ADDRESS, data.as_raw_slice()[0], data.as_raw_slice()[1]];
+        self.i2c.write(ADDR, &buf)
     }
 
     fn read_register<R, const SIZE_BYTES: usize>(
@@ -79,15 +75,9 @@ impl<D: AsyncI2c> AsyncRegisterDevice for Iqs323<D> {
     where
         R: device_driver::Register<SIZE_BYTES, AddressType = Self::AddressType>,
     {
-        self.i2c
-            .transaction(
-                ADDR,
-                &mut [
-                    Operation::Write(&[R::ADDRESS]),
-                    Operation::Write(data.as_raw_slice()),
-                ],
-            )
-            .await
+        const { core::assert!(SIZE_BYTES == 2) };
+        let buf = [R::ADDRESS, data.as_raw_slice()[0], data.as_raw_slice()[1]];
+        self.i2c.write(ADDR, &buf).await
     }
 
     async fn read_register<R, const SIZE_BYTES: usize>(
@@ -120,13 +110,13 @@ impl<'a, T, D: I2c, const BASE_ADDR: u8> RegisterDevice for RegisterBlock<'a, T,
     where
         R: device_driver::Register<SIZE_BYTES, AddressType = Self::AddressType>,
     {
-        self.iqs323.i2c.transaction(
-            ADDR,
-            &mut [
-                Operation::Write(&[BASE_ADDR + R::ADDRESS]),
-                Operation::Write(data.as_raw_slice()),
-            ],
-        )
+        const { core::assert!(SIZE_BYTES == 2) };
+        let buf = [
+            BASE_ADDR + R::ADDRESS,
+            data.as_raw_slice()[0],
+            data.as_raw_slice()[1],
+        ];
+        self.iqs323.i2c.write(ADDR, &buf)
     }
 
     fn read_register<R, const SIZE_BYTES: usize>(
@@ -156,16 +146,13 @@ impl<'a, T, D: AsyncI2c, const BASE_ADDR: u8> AsyncRegisterDevice
     where
         R: device_driver::Register<SIZE_BYTES, AddressType = Self::AddressType>,
     {
-        self.iqs323
-            .i2c
-            .transaction(
-                ADDR,
-                &mut [
-                    Operation::Write(&[BASE_ADDR + R::ADDRESS]),
-                    Operation::Write(data.as_raw_slice()),
-                ],
-            )
-            .await
+        const { core::assert!(SIZE_BYTES == 2) };
+        let buf = [
+            BASE_ADDR + R::ADDRESS,
+            data.as_raw_slice()[0],
+            data.as_raw_slice()[1],
+        ];
+        self.iqs323.i2c.write(ADDR, &buf).await
     }
 
     async fn read_register<R, const SIZE_BYTES: usize>(
