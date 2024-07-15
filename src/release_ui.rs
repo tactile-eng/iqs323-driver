@@ -3,10 +3,10 @@
 use super::*;
 
 pub struct ReleaseUiRegisters;
-type ReleaseUi<'a, D> = RegisterBlock<'a, ReleaseUiRegisters, D>;
+type ReleaseUi<'a, D, P> = RegisterBlock<'a, ReleaseUiRegisters, D, P>;
 
-impl<D> Iqs323<D> {
-    pub fn ui(&mut self) -> ReleaseUi<D> {
+impl<D, P> Iqs323<D, P> {
+    pub fn ui(&mut self) -> ReleaseUi<D, P> {
         RegisterBlock {
             iqs323: self,
             phantom: PhantomData,
@@ -15,7 +15,7 @@ impl<D> Iqs323<D> {
 }
 
 device_driver::implement_device!(
-    impl<'a, D> ReleaseUi<'a, D> {
+    impl<'a, D, P> ReleaseUi<'a, D, P> {
         register Ch0ActivationLta {
             type RWType = ReadOnly;
             type ByteOrder = LE;

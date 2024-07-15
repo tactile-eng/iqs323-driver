@@ -1,10 +1,10 @@
 use super::*;
 
 pub struct SysControlRegisters;
-type SysControl<'a, D> = RegisterBlock<'a, SysControlRegisters, D>;
+type SysControl<'a, D, P> = RegisterBlock<'a, SysControlRegisters, D, P>;
 
-impl<D> Iqs323<D> {
-    pub fn sys_control(&mut self) -> SysControl<D> {
+impl<D, P> Iqs323<D, P> {
+    pub fn sys_control(&mut self) -> SysControl<D, P> {
         RegisterBlock {
             iqs323: self,
             phantom: PhantomData,
@@ -13,7 +13,7 @@ impl<D> Iqs323<D> {
 }
 
 device_driver::implement_device!(
-    impl<'a, D> SysControl<'a, D> {
+    impl<'a, D, P> SysControl<'a, D, P> {
         register Control {
             type RWType = ReadWrite;
             type ByteOrder = LE;

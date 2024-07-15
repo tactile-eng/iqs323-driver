@@ -1,10 +1,10 @@
 use super::*;
 
 pub struct SliderConfigRegisters;
-type SliderConfig<'a, D> = RegisterBlock<'a, SliderConfigRegisters, D>;
+type SliderConfig<'a, D, P> = RegisterBlock<'a, SliderConfigRegisters, D, P>;
 
-impl<D> Iqs323<D> {
-    pub fn slider_config(&mut self) -> SliderConfig<D> {
+impl<D, P> Iqs323<D, P> {
+    pub fn slider_config(&mut self) -> SliderConfig<D, P> {
         RegisterBlock {
             iqs323: self,
             phantom: PhantomData,
@@ -13,7 +13,7 @@ impl<D> Iqs323<D> {
 }
 
 device_driver::implement_device!(
-    impl<'a, D> SliderConfig<'a, D> {
+    impl<'a, D, P> SliderConfig<'a, D, P> {
         register SliderSetup {
             type RWType = ReadWrite;
             type ByteOrder = LE;
@@ -93,7 +93,7 @@ device_driver::implement_device!(
 cfg_if::cfg_if! {
     if #[cfg(feature = "movement-ui")] {
         device_driver::implement_device!(
-            impl<'a, D> SliderConfig<'a, D> {
+            impl<'a, D, P> SliderConfig<'a, D, P> {
                 register SliderEnableStatusPointer {
                     type RWType = ReadWrite;
                     type ByteOrder = LE;
@@ -116,7 +116,7 @@ cfg_if::cfg_if! {
         }
     } else {
         device_driver::implement_device!(
-            impl<'a, D> SliderConfig<'a, D> {
+            impl<'a, D, P> SliderConfig<'a, D, P> {
                 register SliderEnableStatusPointer {
                     type RWType = ReadWrite;
                     type ByteOrder = LE;

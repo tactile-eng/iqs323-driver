@@ -3,10 +3,10 @@
 use super::*;
 
 pub struct MovementUiRegisters;
-type MovementUi<'a, D> = RegisterBlock<'a, MovementUiRegisters, D>;
+type MovementUi<'a, D, P> = RegisterBlock<'a, MovementUiRegisters, D, P>;
 
-impl<D> Iqs323<D> {
-    pub fn ui(&mut self) -> MovementUi<D> {
+impl<D, P> Iqs323<D, P> {
+    pub fn ui(&mut self) -> MovementUi<D, P> {
         RegisterBlock {
             iqs323: self,
             phantom: PhantomData,
@@ -15,7 +15,7 @@ impl<D> Iqs323<D> {
 }
 
 device_driver::implement_device!(
-    impl<D> Iqs323<D> {
+    impl<D, P> Iqs323<D, P> {
         register Ch0MovementLta {
             type RWType = ReadOnly;
             type ByteOrder = LE;

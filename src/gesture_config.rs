@@ -1,10 +1,10 @@
 use super::*;
 
 pub struct GestureConfigRegisters;
-type GestureConfig<'a, D> = RegisterBlock<'a, GestureConfigRegisters, D>;
+type GestureConfig<'a, D, P> = RegisterBlock<'a, GestureConfigRegisters, D, P>;
 
-impl<D> Iqs323<D> {
-    pub fn gesture_config(&mut self) -> GestureConfig<D> {
+impl<D, P> Iqs323<D, P> {
+    pub fn gesture_config(&mut self) -> GestureConfig<D, P> {
         RegisterBlock {
             iqs323: self,
             phantom: PhantomData,
@@ -13,7 +13,7 @@ impl<D> Iqs323<D> {
 }
 
 device_driver::implement_device!(
-    impl<'a, D> GestureConfig<'a, D> {
+    impl<'a, D, P> GestureConfig<'a, D, P> {
         register GestureEnable {
             type RWType = ReadWrite;
             type ByteOrder = LE;

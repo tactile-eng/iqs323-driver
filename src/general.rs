@@ -1,10 +1,10 @@
 use super::*;
 
 pub struct GeneralRegisters;
-type General<'a, D> = RegisterBlock<'a, GeneralRegisters, D>;
+type General<'a, D, P> = RegisterBlock<'a, GeneralRegisters, D, P>;
 
-impl<D> Iqs323<D> {
-    pub fn general(&mut self) -> General<D> {
+impl<D, P> Iqs323<D, P> {
+    pub fn general(&mut self) -> General<D, P> {
         RegisterBlock {
             iqs323: self,
             phantom: PhantomData,
@@ -13,7 +13,7 @@ impl<D> Iqs323<D> {
 }
 
 device_driver::implement_device!(
-    impl<'a, D> General<'a, D> {
+    impl<'a, D, P> General<'a, D, P> {
         register OutAMask {
             type RWType = ReadWrite;
             type ByteOrder = LE;
@@ -45,7 +45,7 @@ device_driver::implement_device!(
 cfg_if::cfg_if! {
     if #[cfg(feature = "movement-ui")] {
         device_driver::implement_device!(
-            impl<'a, D> General<'a, D> {
+            impl<'a, D, P> General<'a, D, P> {
                 register EventsEnable {
                     type RWType = ReadWrite;
                     type ByteOrder = LE;
@@ -71,7 +71,7 @@ cfg_if::cfg_if! {
         );
     } else {
         device_driver::implement_device!(
-            impl<'a, D> General<'a, D> {
+            impl<'a, D, P> General<'a, D, P> {
                 register EventsEnable {
                     type RWType = ReadWrite;
                     type ByteOrder = LE;

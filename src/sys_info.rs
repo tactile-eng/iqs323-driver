@@ -1,10 +1,10 @@
 use super::*;
 
 pub struct SysInfoRegisters;
-type SysInfo<'a, D> = RegisterBlock<'a, SysInfoRegisters, D>;
+type SysInfo<'a, D, P> = RegisterBlock<'a, SysInfoRegisters, D, P>;
 
-impl<D> Iqs323<D> {
-    pub fn sys_info(&mut self) -> SysInfo<D> {
+impl<D, P> Iqs323<D, P> {
+    pub fn sys_info(&mut self) -> SysInfo<D, P> {
         RegisterBlock {
             iqs323: self,
             phantom: PhantomData,
@@ -16,7 +16,7 @@ impl<D> Iqs323<D> {
 cfg_if::cfg_if! {
     if #[cfg(feature = "movement-ui")] {
         device_driver::implement_device!(
-            impl<D> Iqs323<D> {
+            impl<D, P> Iqs323<D, P> {
                 register Version {
                     type RWType = ReadOnly;
                     type ByteOrder = LE;
@@ -32,7 +32,7 @@ cfg_if::cfg_if! {
         );
     } else {
         device_driver::implement_device!(
-            impl<D> Iqs323<D> {
+            impl<D, P> Iqs323<D, P> {
                 register Version {
                     type RWType = ReadOnly;
                     type ByteOrder = LE;
@@ -50,7 +50,7 @@ cfg_if::cfg_if! {
 }
 
 device_driver::implement_device!(
-    impl<'a, D> SysInfo<'a, D> {
+    impl<'a, D, P> SysInfo<'a, D, P> {
         register SystemStatus {
             type RWType = ReadOnly;
             type ByteOrder = LE;

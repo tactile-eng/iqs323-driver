@@ -6,9 +6,10 @@
 use core::marker::PhantomData;
 
 use bitvec::array::BitArray;
-use device_driver::{bitvec, AsyncRegisterDevice, RegisterDevice};
-use embedded_hal::i2c::I2c;
-use embedded_hal_async::i2c::I2c as AsyncI2c;
+use device_driver::{bitvec, AsyncRegisterDevice};
+use embedded_hal::digital::{self, InputPin};
+use embedded_hal_async::digital::Wait;
+use embedded_hal_async::i2c::{self, I2c};
 
 pub mod channel_setup;
 pub mod filter_betas;
@@ -24,47 +25,48 @@ pub mod sys_info;
 
 const ADDR: u8 = 0x44;
 
-pub struct Iqs323<D> {
+#[derive(Debug, Copy, Clone)]
+#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
+pub enum Error<D: i2c::Error, P: digital::Error> {
+    Io(P),
+    I2c(D),
+}
+
+pub struct Iqs323<D, P> {
     i2c: D,
+    rdy: P,
 }
 
-impl<D> Iqs323<D> {
-    pub fn new(i2c: D) -> Self {
-        Iqs323 { i2c }
+impl<D, P> Iqs323<D, P> {
+    pub fn new(i2c: D, rdy: P) -> Self {
+        Iqs323 { i2c, rdy }
+    }
+
+    pub fn mclr(&mut self) -> &mut P {
+        &mut self.rdy
     }
 }
 
-impl<D: I2c> RegisterDevice for Iqs323<D> {
-    type Error = D::Error;
-
-    type AddressType = u8;
-
-    fn write_register<R, const SIZE_BYTES: usize>(
-        &mut self,
-        data: &BitArray<[u8; SIZE_BYTES]>,
-    ) -> Result<(), Self::Error>
-    where
-        R: device_driver::Register<SIZE_BYTES, AddressType = Self::AddressType>,
-    {
-        const { core::assert!(SIZE_BYTES == 2) };
-        let buf = [R::ADDRESS, data.as_raw_slice()[0], data.as_raw_slice()[1]];
-        self.i2c.write(ADDR, &buf)
+impl<D: I2c, P: InputPin> Iqs323<D, P> {
+    pub async fn force_comms(&mut self) -> Result<(), Error<D::Error, P::Error>> {
+        if self.rdy.is_high().map_err(Error::Io)? {
+            self.i2c.write(ADDR, &[0xff]).await.map_err(Error::I2c)
+        } else {
+            Ok(())
+        }
     }
 
-    fn read_register<R, const SIZE_BYTES: usize>(
-        &mut self,
-        data: &mut BitArray<[u8; SIZE_BYTES]>,
-    ) -> Result<(), Self::Error>
-    where
-        R: device_driver::Register<SIZE_BYTES, AddressType = Self::AddressType>,
-    {
-        self.i2c
-            .write_read(ADDR, &[R::ADDRESS], data.as_raw_mut_slice())
+    pub async fn terminate_comms(&mut self) -> Result<(), Error<D::Error, P::Error>> {
+        if self.rdy.is_low().map_err(Error::Io)? {
+            self.i2c.write(ADDR, &[0xff]).await.map_err(Error::I2c)
+        } else {
+            Ok(())
+        }
     }
 }
 
-impl<D: AsyncI2c> AsyncRegisterDevice for Iqs323<D> {
-    type Error = D::Error;
+impl<D: I2c, P: Wait> AsyncRegisterDevice for Iqs323<D, P> {
+    type Error = Error<D::Error, P::Error>;
 
     type AddressType = u8;
 
@@ -77,7 +79,8 @@ impl<D: AsyncI2c> AsyncRegisterDevice for Iqs323<D> {
     {
         const { core::assert!(SIZE_BYTES == 2) };
         let buf = [R::ADDRESS, data.as_raw_slice()[0], data.as_raw_slice()[1]];
-        self.i2c.write(ADDR, &buf).await
+        self.rdy.wait_for_low().await.map_err(Error::Io)?;
+        self.i2c.write(ADDR, &buf).await.map_err(Error::I2c)
     }
 
     async fn read_register<R, const SIZE_BYTES: usize>(
@@ -87,57 +90,25 @@ impl<D: AsyncI2c> AsyncRegisterDevice for Iqs323<D> {
     where
         R: device_driver::Register<SIZE_BYTES, AddressType = Self::AddressType>,
     {
+        self.rdy.wait_for_low().await.map_err(Error::Io)?;
         self.i2c
             .write_read(ADDR, &[R::ADDRESS], data.as_raw_mut_slice())
             .await
+            .map_err(Error::I2c)
     }
 }
 
-pub struct RegisterBlock<'a, T, D, const BASE_ADDR: u8 = 0> {
-    iqs323: &'a mut Iqs323<D>,
+pub struct RegisterBlock<'a, T, D, P, const BASE_ADDR: u8 = 0> {
+    iqs323: &'a mut Iqs323<D, P>,
     phantom: PhantomData<T>,
 }
 
-impl<'a, T, D: I2c, const BASE_ADDR: u8> RegisterDevice for RegisterBlock<'a, T, D, BASE_ADDR> {
-    type Error = <Iqs323<D> as RegisterDevice>::Error;
-
-    type AddressType = <Iqs323<D> as RegisterDevice>::AddressType;
-
-    fn write_register<R, const SIZE_BYTES: usize>(
-        &mut self,
-        data: &BitArray<[u8; SIZE_BYTES]>,
-    ) -> Result<(), Self::Error>
-    where
-        R: device_driver::Register<SIZE_BYTES, AddressType = Self::AddressType>,
-    {
-        const { core::assert!(SIZE_BYTES == 2) };
-        let buf = [
-            BASE_ADDR + R::ADDRESS,
-            data.as_raw_slice()[0],
-            data.as_raw_slice()[1],
-        ];
-        self.iqs323.i2c.write(ADDR, &buf)
-    }
-
-    fn read_register<R, const SIZE_BYTES: usize>(
-        &mut self,
-        data: &mut BitArray<[u8; SIZE_BYTES]>,
-    ) -> Result<(), Self::Error>
-    where
-        R: device_driver::Register<SIZE_BYTES, AddressType = Self::AddressType>,
-    {
-        self.iqs323
-            .i2c
-            .write_read(ADDR, &[BASE_ADDR + R::ADDRESS], data.as_raw_mut_slice())
-    }
-}
-
-impl<'a, T, D: AsyncI2c, const BASE_ADDR: u8> AsyncRegisterDevice
-    for RegisterBlock<'a, T, D, BASE_ADDR>
+impl<'a, T, D: I2c, P: Wait, const BASE_ADDR: u8> AsyncRegisterDevice
+    for RegisterBlock<'a, T, D, P, BASE_ADDR>
 {
-    type Error = <Iqs323<D> as AsyncRegisterDevice>::Error;
+    type Error = Error<D::Error, P::Error>;
 
-    type AddressType = <Iqs323<D> as AsyncRegisterDevice>::AddressType;
+    type AddressType = u8;
 
     async fn write_register<R, const SIZE_BYTES: usize>(
         &mut self,
@@ -152,7 +123,8 @@ impl<'a, T, D: AsyncI2c, const BASE_ADDR: u8> AsyncRegisterDevice
             data.as_raw_slice()[0],
             data.as_raw_slice()[1],
         ];
-        self.iqs323.i2c.write(ADDR, &buf).await
+        self.iqs323.rdy.wait_for_low().await.map_err(Error::Io)?;
+        self.iqs323.i2c.write(ADDR, &buf).await.map_err(Error::I2c)
     }
 
     async fn read_register<R, const SIZE_BYTES: usize>(
@@ -162,9 +134,11 @@ impl<'a, T, D: AsyncI2c, const BASE_ADDR: u8> AsyncRegisterDevice
     where
         R: device_driver::Register<SIZE_BYTES, AddressType = Self::AddressType>,
     {
+        self.iqs323.rdy.wait_for_low().await.map_err(Error::Io)?;
         self.iqs323
             .i2c
             .write_read(ADDR, &[BASE_ADDR + R::ADDRESS], data.as_raw_mut_slice())
             .await
+            .map_err(Error::I2c)
     }
 }

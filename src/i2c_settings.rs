@@ -1,10 +1,10 @@
 use super::*;
 
 pub struct I2cRegisters;
-type I2cSettings<'a, D> = RegisterBlock<'a, I2cRegisters, D>;
+type I2cSettings<'a, D, P> = RegisterBlock<'a, I2cRegisters, D, P>;
 
-impl<D> Iqs323<D> {
-    pub fn i2c(&mut self) -> I2cSettings<D> {
+impl<D, P> Iqs323<D, P> {
+    pub fn i2c(&mut self) -> I2cSettings<D, P> {
         RegisterBlock {
             iqs323: self,
             phantom: PhantomData,
@@ -13,7 +13,7 @@ impl<D> Iqs323<D> {
 }
 
 device_driver::implement_device!(
-    impl<'a, D> I2cSettings<'a, D> {
+    impl<'a, D, P> I2cSettings<'a, D, P> {
         register Settings {
             type RWType = ReadWrite;
             type ByteOrder = LE;

@@ -1,25 +1,25 @@
 use super::*;
 
 pub struct ChannelSetupRegisters;
-type ChannelSetup<'a, D, const BASE_ADDR: u8> =
-    RegisterBlock<'a, ChannelSetupRegisters, D, BASE_ADDR>;
+type ChannelSetup<'a, D, P, const BASE_ADDR: u8> =
+    RegisterBlock<'a, ChannelSetupRegisters, D, P, BASE_ADDR>;
 
-impl<D> Iqs323<D> {
-    pub fn channel_0_setup(&mut self) -> ChannelSetup<D, 0x60> {
+impl<D, P> Iqs323<D, P> {
+    pub fn channel_0_setup(&mut self) -> ChannelSetup<D, P, 0x60> {
         RegisterBlock {
             iqs323: self,
             phantom: PhantomData,
         }
     }
 
-    pub fn channel_1_setup(&mut self) -> ChannelSetup<D, 0x70> {
+    pub fn channel_1_setup(&mut self) -> ChannelSetup<D, P, 0x70> {
         RegisterBlock {
             iqs323: self,
             phantom: PhantomData,
         }
     }
 
-    pub fn channel_2_setup(&mut self) -> ChannelSetup<D, 0x80> {
+    pub fn channel_2_setup(&mut self) -> ChannelSetup<D, P, 0x80> {
         RegisterBlock {
             iqs323: self,
             phantom: PhantomData,
@@ -28,7 +28,7 @@ impl<D> Iqs323<D> {
 }
 
 device_driver::implement_device!(
-    impl<'a, D, const BASE_ADDR: u8> ChannelSetup<'a, D, BASE_ADDR> {
+    impl<'a, D, P, const BASE_ADDR: u8> ChannelSetup<'a, D, P, BASE_ADDR> {
         register Setup {
             type RWType = ReadWrite;
             type ByteOrder = LE;
@@ -75,7 +75,7 @@ device_driver::implement_device!(
 
 #[cfg(feature = "movement-ui")]
 device_driver::implement_device!(
-    impl<'a, D, const BASE_ADDR: u8> ChannelSetup<'a, D, BASE_ADDR> {
+    impl<'a, D, P, const BASE_ADDR: u8> ChannelSetup<'a, D, P, BASE_ADDR> {
         register MovementUiSettings {
             type RWType = ReadWrite;
             type ByteOrder = LE;

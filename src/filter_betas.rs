@@ -1,10 +1,10 @@
 use super::*;
 
 pub struct FilterBetaRegisters;
-type FilterBetas<'a, D> = RegisterBlock<'a, FilterBetaRegisters, D>;
+type FilterBetas<'a, D, P> = RegisterBlock<'a, FilterBetaRegisters, D, P>;
 
-impl<D> Iqs323<D> {
-    pub fn filter_betas(&mut self) -> FilterBetas<D> {
+impl<D, P> Iqs323<D, P> {
+    pub fn filter_betas(&mut self) -> FilterBetas<D, P> {
         RegisterBlock {
             iqs323: self,
             phantom: PhantomData,
@@ -13,7 +13,7 @@ impl<D> Iqs323<D> {
 }
 
 device_driver::implement_device!(
-    impl<'a, D> FilterBetas<'a, D> {
+    impl<'a, D, P> FilterBetas<'a, D, P> {
         register Counts {
             type RWType = ReadWrite;
             type ByteOrder = LE;
@@ -55,7 +55,7 @@ device_driver::implement_device!(
 cfg_if::cfg_if! {
     if #[cfg(feature = "movement-ui")] {
         device_driver::implement_device!(
-            impl<'a, D> FilterBetas<'a, D> {
+            impl<'a, D, P> FilterBetas<'a, D, P> {
                 register MovementLta {
                     type RWType = ReadWrite;
                     type ByteOrder = LE;
@@ -69,7 +69,7 @@ cfg_if::cfg_if! {
         );
     } else {
         device_driver::implement_device!(
-            impl<'a, D> FilterBetas<'a, D> {
+            impl<'a, D, P> FilterBetas<'a, D, P> {
                 register ActivationLta {
                     type RWType = ReadWrite;
                     type ByteOrder = LE;
