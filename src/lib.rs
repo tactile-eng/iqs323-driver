@@ -62,13 +62,8 @@ impl<D: I2c> RegisterDevice for Iqs323<D> {
     where
         R: device_driver::Register<SIZE_BYTES, AddressType = Self::AddressType>,
     {
-        self.i2c.transaction(
-            ADDR,
-            &mut [
-                Operation::Write(&[R::ADDRESS]),
-                Operation::Read(data.as_raw_mut_slice()),
-            ],
-        )
+        self.i2c
+            .write_read(ADDR, &[R::ADDRESS], data.as_raw_mut_slice())
     }
 }
 
@@ -103,13 +98,7 @@ impl<D: AsyncI2c> AsyncRegisterDevice for Iqs323<D> {
         R: device_driver::Register<SIZE_BYTES, AddressType = Self::AddressType>,
     {
         self.i2c
-            .transaction(
-                ADDR,
-                &mut [
-                    Operation::Write(&[R::ADDRESS]),
-                    Operation::Read(data.as_raw_mut_slice()),
-                ],
-            )
+            .write_read(ADDR, &[R::ADDRESS], data.as_raw_mut_slice())
             .await
     }
 }
@@ -147,13 +136,9 @@ impl<'a, T, D: I2c, const BASE_ADDR: u8> RegisterDevice for RegisterBlock<'a, T,
     where
         R: device_driver::Register<SIZE_BYTES, AddressType = Self::AddressType>,
     {
-        self.iqs323.i2c.transaction(
-            ADDR,
-            &mut [
-                Operation::Write(&[BASE_ADDR + R::ADDRESS]),
-                Operation::Read(data.as_raw_mut_slice()),
-            ],
-        )
+        self.iqs323
+            .i2c
+            .write_read(ADDR, &[BASE_ADDR + R::ADDRESS], data.as_raw_mut_slice())
     }
 }
 
@@ -192,13 +177,7 @@ impl<'a, T, D: AsyncI2c, const BASE_ADDR: u8> AsyncRegisterDevice
     {
         self.iqs323
             .i2c
-            .transaction(
-                ADDR,
-                &mut [
-                    Operation::Write(&[BASE_ADDR + R::ADDRESS]),
-                    Operation::Read(data.as_raw_mut_slice()),
-                ],
-            )
+            .write_read(ADDR, &[BASE_ADDR + R::ADDRESS], data.as_raw_mut_slice())
             .await
     }
 }
