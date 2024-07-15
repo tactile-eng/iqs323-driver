@@ -5,7 +5,7 @@ use super::*;
 pub struct ReleaseUiRegisters;
 type ReleaseUi<'a, D> = RegisterBlock<'a, ReleaseUiRegisters, D>;
 
-impl<D: I2c> Iqs323<D> {
+impl<D> Iqs323<D> {
     pub fn ui(&mut self) -> ReleaseUi<D> {
         RegisterBlock {
             iqs323: self,
@@ -15,7 +15,7 @@ impl<D: I2c> Iqs323<D> {
 }
 
 device_driver::implement_device!(
-    impl<'a, D: I2c> ReleaseUi<'a, D> {
+    impl<'a, D> ReleaseUi<'a, D> {
         register Ch0ActivationLta {
             type RWType = ReadOnly;
             const ADDRESS: u8 = 0x20;

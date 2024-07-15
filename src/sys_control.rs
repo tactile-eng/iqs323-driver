@@ -3,7 +3,7 @@ use super::*;
 pub struct SysControlRegisters;
 type SysControl<'a, D> = RegisterBlock<'a, SysControlRegisters, D>;
 
-impl<D: I2c> Iqs323<D> {
+impl<D> Iqs323<D> {
     pub fn sys_control(&mut self) -> SysControl<D> {
         RegisterBlock {
             iqs323: self,
@@ -13,7 +13,7 @@ impl<D: I2c> Iqs323<D> {
 }
 
 device_driver::implement_device!(
-    impl<'a, D: I2c> SysControl<'a, D> {
+    impl<'a, D> SysControl<'a, D> {
         register Control {
             type RWType = ReadWrite;
             const ADDRESS: u8 = 0xc0;

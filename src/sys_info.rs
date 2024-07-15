@@ -3,7 +3,7 @@ use super::*;
 pub struct SysInfoRegisters;
 type SysInfo<'a, D> = RegisterBlock<'a, SysInfoRegisters, D>;
 
-impl<D: I2c> Iqs323<D> {
+impl<D> Iqs323<D> {
     pub fn sys_info(&mut self) -> SysInfo<D> {
         RegisterBlock {
             iqs323: self,
@@ -16,7 +16,7 @@ impl<D: I2c> Iqs323<D> {
 cfg_if::cfg_if! {
     if #[cfg(feature = "movement-ui")] {
         device_driver::implement_device!(
-            impl<D: I2c> Iqs323<D> {
+            impl<D> Iqs323<D> {
                 register Version {
                     type RWType = ReadOnly;
                     const ADDRESS: u8 = 0;
@@ -31,7 +31,7 @@ cfg_if::cfg_if! {
         );
     } else {
         device_driver::implement_device!(
-            impl<D: I2c> Iqs323<D> {
+            impl<D> Iqs323<D> {
                 register Version {
                     type RWType = ReadOnly;
                     const ADDRESS: u8 = 0;
@@ -48,7 +48,7 @@ cfg_if::cfg_if! {
 }
 
 device_driver::implement_device!(
-    impl<'a, D: I2c> SysInfo<'a, D> {
+    impl<'a, D> SysInfo<'a, D> {
         register SystemStatus {
             type RWType = ReadOnly;
             const ADDRESS: u8 = 0x10;

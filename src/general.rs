@@ -3,7 +3,7 @@ use super::*;
 pub struct GeneralRegisters;
 type General<'a, D> = RegisterBlock<'a, GeneralRegisters, D>;
 
-impl<D: I2c> Iqs323<D> {
+impl<D> Iqs323<D> {
     pub fn general(&mut self) -> General<D> {
         RegisterBlock {
             iqs323: self,
@@ -13,7 +13,7 @@ impl<D: I2c> Iqs323<D> {
 }
 
 device_driver::implement_device!(
-    impl<'a, D: I2c> General<'a, D> {
+    impl<'a, D> General<'a, D> {
         register OutAMask {
             type RWType = ReadWrite;
             const ADDRESS: u8 = 0xd0;
@@ -42,7 +42,7 @@ device_driver::implement_device!(
 cfg_if::cfg_if! {
     if #[cfg(feature = "movement-ui")] {
         device_driver::implement_device!(
-            impl<'a, D: I2c> General<'a, D> {
+            impl<'a, D> General<'a, D> {
                 register EventsEnable {
                     type RWType = ReadWrite;
                     const ADDRESS: u8 = 0xd3;
@@ -66,7 +66,7 @@ cfg_if::cfg_if! {
         );
     } else {
         device_driver::implement_device!(
-            impl<'a, D: I2c> General<'a, D> {
+            impl<'a, D> General<'a, D> {
                 register EventsEnable {
                     type RWType = ReadWrite;
                     const ADDRESS: u8 = 0xd3;

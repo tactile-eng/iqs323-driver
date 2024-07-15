@@ -3,7 +3,7 @@ use super::*;
 pub struct SliderConfigRegisters;
 type SliderConfig<'a, D> = RegisterBlock<'a, SliderConfigRegisters, D>;
 
-impl<D: I2c> Iqs323<D> {
+impl<D> Iqs323<D> {
     pub fn slider_config(&mut self) -> SliderConfig<D> {
         RegisterBlock {
             iqs323: self,
@@ -13,7 +13,7 @@ impl<D: I2c> Iqs323<D> {
 }
 
 device_driver::implement_device!(
-    impl<'a, D: I2c> SliderConfig<'a, D> {
+    impl<'a, D> SliderConfig<'a, D> {
         register SliderSetup {
             type RWType = ReadWrite;
             const ADDRESS: u8 = 0x90;
@@ -85,7 +85,7 @@ device_driver::implement_device!(
 cfg_if::cfg_if! {
     if #[cfg(feature = "movement-ui")] {
         device_driver::implement_device!(
-            impl<'a, D: I2c> SliderConfig<'a, D> {
+            impl<'a, D> SliderConfig<'a, D> {
                 register SliderEnableStatusPointer {
                     type RWType = ReadWrite;
                     const ADDRESS: u8 = 0x95;
@@ -107,7 +107,7 @@ cfg_if::cfg_if! {
         }
     } else {
         device_driver::implement_device!(
-            impl<'a, D: I2c> SliderConfig<'a, D> {
+            impl<'a, D> SliderConfig<'a, D> {
                 register SliderEnableStatusPointer {
                     type RWType = ReadWrite;
                     const ADDRESS: u8 = 0x95;

@@ -3,7 +3,7 @@ use super::*;
 pub struct FilterBetaRegisters;
 type FilterBetas<'a, D> = RegisterBlock<'a, FilterBetaRegisters, D>;
 
-impl<D: I2c> Iqs323<D> {
+impl<D> Iqs323<D> {
     pub fn filter_betas(&mut self) -> FilterBetas<D> {
         RegisterBlock {
             iqs323: self,
@@ -13,7 +13,7 @@ impl<D: I2c> Iqs323<D> {
 }
 
 device_driver::implement_device!(
-    impl<'a, D: I2c> FilterBetas<'a, D> {
+    impl<'a, D> FilterBetas<'a, D> {
         register Counts {
             type RWType = ReadWrite;
             const ADDRESS: u8 = 0xb0;
@@ -51,7 +51,7 @@ device_driver::implement_device!(
 cfg_if::cfg_if! {
     if #[cfg(feature = "movement-ui")] {
         device_driver::implement_device!(
-            impl<'a, D: I2c> FilterBetas<'a, D> {
+            impl<'a, D> FilterBetas<'a, D> {
                 register MovementLta {
                     type RWType = ReadWrite;
                     const ADDRESS: u8 = 0xb3;
@@ -64,7 +64,7 @@ cfg_if::cfg_if! {
         );
     } else {
         device_driver::implement_device!(
-            impl<'a, D: I2c> FilterBetas<'a, D> {
+            impl<'a, D> FilterBetas<'a, D> {
                 register ActivationLta {
                     type RWType = ReadWrite;
                     const ADDRESS: u8 = 0xb3;

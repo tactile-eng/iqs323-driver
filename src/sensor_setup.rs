@@ -4,7 +4,7 @@ pub struct SensorSetupRegisters;
 type SensorSetup<'a, D, const BASE_ADDR: u8> =
     RegisterBlock<'a, SensorSetupRegisters, D, BASE_ADDR>;
 
-impl<D: I2c> Iqs323<D> {
+impl<D> Iqs323<D> {
     pub fn sensor_0_setup(&mut self) -> SensorSetup<D, 0x30> {
         RegisterBlock {
             iqs323: self,
@@ -28,7 +28,7 @@ impl<D: I2c> Iqs323<D> {
 }
 
 device_driver::implement_device!(
-    impl<'a, D: I2c, const BASE_ADDR: u8> SensorSetup<'a, D, BASE_ADDR> {
+    impl<'a, D, const BASE_ADDR: u8> SensorSetup<'a, D, BASE_ADDR> {
         register Setup {
             type RWType = ReadWrite;
             const ADDRESS: u8 = 0x00;

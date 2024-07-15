@@ -5,7 +5,7 @@ use super::*;
 pub struct MovementUiRegisters;
 type MovementUi<'a, D> = RegisterBlock<'a, MovementUiRegisters, D>;
 
-impl<D: I2c> Iqs323<D> {
+impl<D> Iqs323<D> {
     pub fn ui(&mut self) -> MovementUi<D> {
         RegisterBlock {
             iqs323: self,
@@ -15,7 +15,7 @@ impl<D: I2c> Iqs323<D> {
 }
 
 device_driver::implement_device!(
-    impl<D: I2c> Iqs323<D> {
+    impl<D> Iqs323<D> {
         register Ch0MovementLta {
             type RWType = ReadOnly;
             const ADDRESS: u8 = 0x20;

@@ -4,7 +4,7 @@ pub struct ChannelSetupRegisters;
 type ChannelSetup<'a, D, const BASE_ADDR: u8> =
     RegisterBlock<'a, ChannelSetupRegisters, D, BASE_ADDR>;
 
-impl<D: I2c> Iqs323<D> {
+impl<D> Iqs323<D> {
     pub fn channel_0_setup(&mut self) -> ChannelSetup<D, 0x60> {
         RegisterBlock {
             iqs323: self,
@@ -28,7 +28,7 @@ impl<D: I2c> Iqs323<D> {
 }
 
 device_driver::implement_device!(
-    impl<'a, D: I2c, const BASE_ADDR: u8> ChannelSetup<'a, D, BASE_ADDR> {
+    impl<'a, D, const BASE_ADDR: u8> ChannelSetup<'a, D, BASE_ADDR> {
         register Setup {
             type RWType = ReadWrite;
             const ADDRESS: u8 = 0x00;
@@ -71,7 +71,7 @@ device_driver::implement_device!(
 
 #[cfg(feature = "movement-ui")]
 device_driver::implement_device!(
-    impl<'a, D: I2c, const BASE_ADDR: u8> ChannelSetup<'a, D, BASE_ADDR> {
+    impl<'a, D, const BASE_ADDR: u8> ChannelSetup<'a, D, BASE_ADDR> {
         register MovementUiSettings {
             type RWType = ReadWrite;
             const ADDRESS: u8 = 0x04;

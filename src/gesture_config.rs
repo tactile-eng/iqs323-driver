@@ -3,7 +3,7 @@ use super::*;
 pub struct GestureConfigRegisters;
 type GestureConfig<'a, D> = RegisterBlock<'a, GestureConfigRegisters, D>;
 
-impl<D: I2c> Iqs323<D> {
+impl<D> Iqs323<D> {
     pub fn gesture_config(&mut self) -> GestureConfig<D> {
         RegisterBlock {
             iqs323: self,
@@ -13,7 +13,7 @@ impl<D: I2c> Iqs323<D> {
 }
 
 device_driver::implement_device!(
-    impl<'a, D: I2c> GestureConfig<'a, D> {
+    impl<'a, D> GestureConfig<'a, D> {
         register GestureEnable {
             type RWType = ReadWrite;
             const ADDRESS: u8 = 0xa0;
