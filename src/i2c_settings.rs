@@ -1,0 +1,33 @@
+use super::*;
+
+pub struct I2cRegisters;
+type I2cSettings<'a, D> = RegisterBlock<'a, I2cRegisters, D>;
+
+impl<D: I2c> Iqs323<D> {
+    pub fn i2c(&mut self) -> I2cSettings<D> {
+        RegisterBlock {
+            iqs323: self,
+            phantom: PhantomData,
+        }
+    }
+}
+
+device_driver::implement_device!(
+    impl<'a, D: I2c> I2cSettings<'a, D> {
+        register Settings {
+            type RWType = ReadWrite;
+            const ADDRESS: u8 = 0xe0;
+            const SIZE_BITS: usize = 16;
+
+            rw_check_disabled: bool = 1,
+            stop_bit_disabled: bool = 0,
+        },
+        register HardwareId {
+            type RWType = ReadOnly;
+            const ADDRESS: u8 = 0xe1;
+            const SIZE_BITS: usize = 16;
+
+            value: u16 = 0..16,
+        }
+    }
+);
