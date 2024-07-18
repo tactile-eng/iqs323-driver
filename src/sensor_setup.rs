@@ -1,31 +1,8 @@
 use super::*;
 
-pub struct SensorSetupRegisters;
-type SensorSetup<'a, D, P, const BASE_ADDR: u8> =
-    RegisterBlock<'a, SensorSetupRegisters, D, P, BASE_ADDR>;
-
-impl<D, P> Iqs323<D, P> {
-    pub fn sensor_0_setup(&mut self) -> SensorSetup<D, P, 0x30> {
-        RegisterBlock {
-            iqs323: self,
-            phantom: PhantomData,
-        }
-    }
-
-    pub fn sensor_1_setup(&mut self) -> SensorSetup<D, P, 0x40> {
-        RegisterBlock {
-            iqs323: self,
-            phantom: PhantomData,
-        }
-    }
-
-    pub fn sensor_2_setup(&mut self) -> SensorSetup<D, P, 0x50> {
-        RegisterBlock {
-            iqs323: self,
-            phantom: PhantomData,
-        }
-    }
-}
+register_block!(
+    /// Sensor Setup (read/write)
+    SensorSetup<BASE_ADDR>);
 
 device_driver::implement_device!(
     impl<'a, D, P, const BASE_ADDR: u8> SensorSetup<'a, D, P, BASE_ADDR> {

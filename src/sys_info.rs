@@ -1,53 +1,9 @@
 use super::*;
 
-pub struct SysInfoRegisters;
-type SysInfo<'a, D, P> = RegisterBlock<'a, SysInfoRegisters, D, P>;
-
-impl<D, P> Iqs323<D, P> {
-    pub fn sys_info(&mut self) -> SysInfo<D, P> {
-        RegisterBlock {
-            iqs323: self,
-            phantom: PhantomData,
-        }
-    }
-}
-
-#[cfg(not(feature = "movement-ui"))]
-cfg_if::cfg_if! {
-    if #[cfg(feature = "movement-ui")] {
-        device_driver::implement_device!(
-            impl<D, P> Iqs323<D, P> {
-                register Version {
-                    type RWType = ReadOnly;
-                    type ByteOrder = LE;
-                    const ADDRESS: u8 = 0;
-                    const SIZE_BITS: usize = 48;
-                    const RESET_VALUE: [u8] = [0xb6, 0x05, 0x01, 0x00, 0x04, 0x00];
-
-                    product_number: u16 = 0..16,
-                    major_version: u16 = 16..32,
-                    minor_version: u16 = 32..48,
-                },
-            }
-        );
-    } else {
-        device_driver::implement_device!(
-            impl<D, P> Iqs323<D, P> {
-                register Version {
-                    type RWType = ReadOnly;
-                    type ByteOrder = LE;
-                    const ADDRESS: u8 = 0;
-                    const SIZE_BITS: usize = 48;
-                    const RESET_VALUE: [u8] = [0x52, 0x04, 0x01, 0x00, 0x03, 0x00];
-
-                    product_number: u16 = 0..16,
-                    major_version: u16 = 16..32,
-                    minor_version: u16 = 32..48,
-                },
-            }
-        );
-    }
-}
+register_block!(
+    /// System Information (read only)
+    SysInfo
+);
 
 device_driver::implement_device!(
     impl<'a, D, P> SysInfo<'a, D, P> {

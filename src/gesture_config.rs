@@ -1,16 +1,9 @@
 use super::*;
 
-pub struct GestureConfigRegisters;
-type GestureConfig<'a, D, P> = RegisterBlock<'a, GestureConfigRegisters, D, P>;
-
-impl<D, P> Iqs323<D, P> {
-    pub fn gesture_config(&mut self) -> GestureConfig<D, P> {
-        RegisterBlock {
-            iqs323: self,
-            phantom: PhantomData,
-        }
-    }
-}
+register_block!(
+    /// Gesture Configuration (read/write)
+    GestureConfig
+);
 
 device_driver::implement_device!(
     impl<'a, D, P> GestureConfig<'a, D, P> {

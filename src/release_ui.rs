@@ -2,17 +2,10 @@
 
 use super::*;
 
-pub struct ReleaseUiRegisters;
-type ReleaseUi<'a, D, P> = RegisterBlock<'a, ReleaseUiRegisters, D, P>;
-
-impl<D, P> Iqs323<D, P> {
-    pub fn ui(&mut self) -> ReleaseUi<D, P> {
-        RegisterBlock {
-            iqs323: self,
-            phantom: PhantomData,
-        }
-    }
-}
+register_block!(
+    /// Release UI (read only)
+    ReleaseUi
+);
 
 device_driver::implement_device!(
     impl<'a, D, P> ReleaseUi<'a, D, P> {

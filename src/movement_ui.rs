@@ -2,20 +2,13 @@
 
 use super::*;
 
-pub struct MovementUiRegisters;
-type MovementUi<'a, D, P> = RegisterBlock<'a, MovementUiRegisters, D, P>;
-
-impl<D, P> Iqs323<D, P> {
-    pub fn ui(&mut self) -> MovementUi<D, P> {
-        RegisterBlock {
-            iqs323: self,
-            phantom: PhantomData,
-        }
-    }
-}
+register_block!(
+    /// Movement UI Status (read only)
+    MovementUi
+);
 
 device_driver::implement_device!(
-    impl<D, P> Iqs323<D, P> {
+    impl<'a, D, P> MovementUi<'a, D, P> {
         register Ch0MovementLta {
             type RWType = ReadOnly;
             type ByteOrder = LE;

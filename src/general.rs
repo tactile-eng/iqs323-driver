@@ -1,16 +1,9 @@
 use super::*;
 
-pub struct GeneralRegisters;
-type General<'a, D, P> = RegisterBlock<'a, GeneralRegisters, D, P>;
-
-impl<D, P> Iqs323<D, P> {
-    pub fn general(&mut self) -> General<D, P> {
-        RegisterBlock {
-            iqs323: self,
-            phantom: PhantomData,
-        }
-    }
-}
+register_block!(
+    /// General (read/write)
+    General
+);
 
 device_driver::implement_device!(
     impl<'a, D, P> General<'a, D, P> {
@@ -39,63 +32,53 @@ device_driver::implement_device!(
             touch: u8 = 8..16,
             prox: u8 = 0..8,
         },
+        #[cfg(not(feature = "movement-ui"))]
+        register EventsEnable {
+            type RWType = ReadWrite;
+            type ByteOrder = LE;
+            const ADDRESS: u8 = 0xd3;
+            const SIZE_BITS: usize = 16;
+
+            activation_setting_threshold: u8 = 8..16,
+            ati_error: bool = 6,
+            ati_event: bool = 4,
+            power_event: bool = 3,
+            slider_event: bool = 2,
+            touch_event: bool = 1,
+            prox_event: bool = 0,
+        },
+        #[cfg(feature = "movement-ui")]
+        register EventsEnable {
+            type RWType = ReadWrite;
+            type ByteOrder = LE;
+            const ADDRESS: u8 = 0xd3;
+            const SIZE_BITS: usize = 16;
+
+            ati_error: bool = 6,
+            ati_event: bool = 4,
+            power_event: bool = 3,
+            slider_event: bool = 2,
+            touch_event: bool = 1,
+            prox_event: bool = 0,
+        },
+        #[cfg(not(feature = "movement-ui"))]
+        register ReleaseUiSettings {
+            type RWType = ReadWrite;
+            type ByteOrder = LE;
+            const ADDRESS: u8 = 0xd4;
+            const SIZE_BITS: usize = 16;
+
+            delta_snapshot_sample_delay: u8 = 8..16,
+            release_delta_percentage: u8 = 0..8,
+        },
+        #[cfg(feature = "movement-ui")]
+        register MovementTimeout {
+            type RWType = ReadWrite;
+            type ByteOrder = LE;
+            const ADDRESS: u8 = 0xd4;
+            const SIZE_BITS: usize = 16;
+
+            value: u16 = 0..16,
+        },
     }
 );
-
-cfg_if::cfg_if! {
-    if #[cfg(feature = "movement-ui")] {
-        device_driver::implement_device!(
-            impl<'a, D, P> General<'a, D, P> {
-                register EventsEnable {
-                    type RWType = ReadWrite;
-                    type ByteOrder = LE;
-                    const ADDRESS: u8 = 0xd3;
-                    const SIZE_BITS: usize = 16;
-
-                    ati_error: bool = 6,
-                    ati_event: bool = 4,
-                    power_event: bool = 3,
-                    slider_event: bool = 2,
-                    touch_event: bool = 1,
-                    prox_event: bool = 0,
-                },
-                register MovementTimeout {
-                    type RWType = ReadWrite;
-                    type ByteOrder = LE;
-                    const ADDRESS: u8 = 0xd4;
-                    const SIZE_BITS: usize = 16;
-
-                    value: u16 = 0..16,
-                },
-            }
-        );
-    } else {
-        device_driver::implement_device!(
-            impl<'a, D, P> General<'a, D, P> {
-                register EventsEnable {
-                    type RWType = ReadWrite;
-                    type ByteOrder = LE;
-                    const ADDRESS: u8 = 0xd3;
-                    const SIZE_BITS: usize = 16;
-
-                    activation_setting_threshold: u8 = 8..16,
-                    ati_error: bool = 6,
-                    ati_event: bool = 4,
-                    power_event: bool = 3,
-                    slider_event: bool = 2,
-                    touch_event: bool = 1,
-                    prox_event: bool = 0,
-                },
-                register ReleaseUiSettings {
-                    type RWType = ReadWrite;
-                    type ByteOrder = LE;
-                    const ADDRESS: u8 = 0xd4;
-                    const SIZE_BITS: usize = 16;
-
-                    delta_snapshot_sample_delay: u8 = 8..16,
-                    release_delta_percentage: u8 = 0..8,
-                }
-            }
-        );
-    }
-}

@@ -1,31 +1,9 @@
 use super::*;
 
-pub struct ChannelSetupRegisters;
-type ChannelSetup<'a, D, P, const BASE_ADDR: u8> =
-    RegisterBlock<'a, ChannelSetupRegisters, D, P, BASE_ADDR>;
-
-impl<D, P> Iqs323<D, P> {
-    pub fn channel_0_setup(&mut self) -> ChannelSetup<D, P, 0x60> {
-        RegisterBlock {
-            iqs323: self,
-            phantom: PhantomData,
-        }
-    }
-
-    pub fn channel_1_setup(&mut self) -> ChannelSetup<D, P, 0x70> {
-        RegisterBlock {
-            iqs323: self,
-            phantom: PhantomData,
-        }
-    }
-
-    pub fn channel_2_setup(&mut self) -> ChannelSetup<D, P, 0x80> {
-        RegisterBlock {
-            iqs323: self,
-            phantom: PhantomData,
-        }
-    }
-}
+register_block!(
+    /// Channel Setup (read/write)
+    ChannelSetup<BASE_ADDR>
+);
 
 device_driver::implement_device!(
     impl<'a, D, P, const BASE_ADDR: u8> ChannelSetup<'a, D, P, BASE_ADDR> {
@@ -70,12 +48,7 @@ device_driver::implement_device!(
 
             value: u16 = 0..16,
         },
-    }
-);
-
-#[cfg(feature = "movement-ui")]
-device_driver::implement_device!(
-    impl<'a, D, P, const BASE_ADDR: u8> ChannelSetup<'a, D, P, BASE_ADDR> {
+        #[cfg(feature = "movement-ui")]
         register MovementUiSettings {
             type RWType = ReadWrite;
             type ByteOrder = LE;

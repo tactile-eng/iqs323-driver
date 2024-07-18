@@ -1,16 +1,9 @@
 use super::*;
 
-pub struct SysControlRegisters;
-type SysControl<'a, D, P> = RegisterBlock<'a, SysControlRegisters, D, P>;
-
-impl<D, P> Iqs323<D, P> {
-    pub fn sys_control(&mut self) -> SysControl<D, P> {
-        RegisterBlock {
-            iqs323: self,
-            phantom: PhantomData,
-        }
-    }
-}
+register_block!(
+    /// System Control (read/write)
+    SysControl
+);
 
 device_driver::implement_device!(
     impl<'a, D, P> SysControl<'a, D, P> {

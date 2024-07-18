@@ -1,16 +1,9 @@
 use super::*;
 
-pub struct I2cRegisters;
-type I2cSettings<'a, D, P> = RegisterBlock<'a, I2cRegisters, D, P>;
-
-impl<D, P> Iqs323<D, P> {
-    pub fn i2c(&mut self) -> I2cSettings<D, P> {
-        RegisterBlock {
-            iqs323: self,
-            phantom: PhantomData,
-        }
-    }
-}
+register_block!(
+    /// I2C Settings
+    I2cSettings
+);
 
 device_driver::implement_device!(
     impl<'a, D, P> I2cSettings<'a, D, P> {

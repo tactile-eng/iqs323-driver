@@ -1,16 +1,9 @@
 use super::*;
 
-pub struct SliderConfigRegisters;
-type SliderConfig<'a, D, P> = RegisterBlock<'a, SliderConfigRegisters, D, P>;
-
-impl<D, P> Iqs323<D, P> {
-    pub fn slider_config(&mut self) -> SliderConfig<D, P> {
-        RegisterBlock {
-            iqs323: self,
-            phantom: PhantomData,
-        }
-    }
-}
+register_block!(
+    /// Slider Configuration (read/write)
+    SliderConfig
+);
 
 device_driver::implement_device!(
     impl<'a, D, P> SliderConfig<'a, D, P> {
@@ -87,25 +80,31 @@ device_driver::implement_device!(
 
             value: u16 as DeltaLinkChannel = 0..16,
         },
+        #[cfg(not(feature = "movement-ui"))]
+        register SliderEnableStatusPointer {
+            type RWType = ReadWrite;
+            type ByteOrder = LE;
+            const ADDRESS: u8 = 0x95;
+            const SIZE_BITS: usize = 16;
+            const RESET_VALUE: u16 = 0x558;
+
+            value: u16 = 0..16,
+        },
+        #[cfg(feature = "movement-ui")]
+        register SliderEnableStatusPointer {
+            type RWType = ReadWrite;
+            type ByteOrder = LE;
+            const ADDRESS: u8 = 0x95;
+            const SIZE_BITS: usize = 16;
+            const RESET_VALUE: u16 = 0x552;
+
+            value: u16 = 0..16,
+        },
     }
 );
 
 cfg_if::cfg_if! {
     if #[cfg(feature = "movement-ui")] {
-        device_driver::implement_device!(
-            impl<'a, D, P> SliderConfig<'a, D, P> {
-                register SliderEnableStatusPointer {
-                    type RWType = ReadWrite;
-                    type ByteOrder = LE;
-                    const ADDRESS: u8 = 0x95;
-                    const SIZE_BITS: usize = 16;
-                    const RESET_VALUE: u16 = 0x552;
-
-                    value: u16 = 0..16,
-                },
-            }
-        );
-
         #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, num_enum::IntoPrimitive, num_enum::TryFromPrimitive)]
         #[repr(u16)]
         pub enum DeltaLinkChannel {
@@ -115,20 +114,6 @@ cfg_if::cfg_if! {
             Channel2 = 0x4b8,
         }
     } else {
-        device_driver::implement_device!(
-            impl<'a, D, P> SliderConfig<'a, D, P> {
-                register SliderEnableStatusPointer {
-                    type RWType = ReadWrite;
-                    type ByteOrder = LE;
-                    const ADDRESS: u8 = 0x95;
-                    const SIZE_BITS: usize = 16;
-                    const RESET_VALUE: u16 = 0x558;
-
-                    value: u16 = 0..16,
-                },
-            }
-        );
-
         #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, num_enum::IntoPrimitive, num_enum::TryFromPrimitive)]
         #[repr(u16)]
         pub enum DeltaLinkChannel {
