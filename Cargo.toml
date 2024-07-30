@@ -19,7 +19,7 @@ categories = ["no-std", "embedded", "asynchronous", "hardware-support"]
 cfg-if = "1.0.0"
 defmt = { version = "0.3", optional = true }
 # device-driver = { git = "https://github.com/diondokter/device-driver.git" }
-device-driver = { git = "https://github.com/alexmoon/device-driver.git", branch = "forked" }
+device-driver = { git = "https://github.com/alexmoon/device-driver.git", branch = "register-block" }
 embedded-hal = "1.0.0"
 embedded-hal-async = "1.0.0"
 num_enum = { version = "0.7.2", default-features = false }
