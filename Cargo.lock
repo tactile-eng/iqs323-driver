@@ -70,7 +70,7 @@ dependencies = [
 [[package]]
 name = "device-driver"
 version = "0.6.0"
-source = "git+https://github.com/alexmoon/device-driver.git?branch=register-block#275ed0279e2714aa7c7a6a85ea0cbca59522ef05"
+source = "git+https://github.com/diondokter/device-driver.git#397ce01e2b34699e0a5ae7a1c825b3d98ed8d7a5"
 dependencies = [
  "bitvec",
  "device-driver-macros",
@@ -83,7 +83,7 @@ dependencies = [
 [[package]]
 name = "device-driver-generation"
 version = "0.6.0"
-source = "git+https://github.com/alexmoon/device-driver.git?branch=register-block#275ed0279e2714aa7c7a6a85ea0cbca59522ef05"
+source = "git+https://github.com/diondokter/device-driver.git#397ce01e2b34699e0a5ae7a1c825b3d98ed8d7a5"
 dependencies = [
  "convert_case",
  "indexmap",
@@ -97,7 +97,7 @@ dependencies = [
 [[package]]
 name = "device-driver-macros"
 version = "0.6.0"
-source = "git+https://github.com/alexmoon/device-driver.git?branch=register-block#275ed0279e2714aa7c7a6a85ea0cbca59522ef05"
+source = "git+https://github.com/diondokter/device-driver.git#397ce01e2b34699e0a5ae7a1c825b3d98ed8d7a5"
 dependencies = [
  "device-driver-generation",
  "proc-macro2",

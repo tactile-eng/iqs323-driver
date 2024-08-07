@@ -4,7 +4,7 @@
 //! An embedded async driver for the IQS323 capacitive/inductive sensing controller.
 
 use bitvec::array::BitArray;
-use device_driver::{bitvec, AddressableDevice, AsyncRegisterDevice};
+pub use device_driver::{bitvec, AddressableDevice, AsyncRegisterDevice, Register};
 use embedded_hal::digital::{self, InputPin};
 use embedded_hal_async::digital::Wait;
 use embedded_hal_async::i2c::{self, I2c};
@@ -319,7 +319,7 @@ device_driver::implement_device! {
 
                 cal_cap_rx_selected: bool = 14,
                 cal_cap_tx_selected: bool = 13,
-                txa_enabled: bool = 12,
+                txa_enabled: bool = 11,
                 ctx2_enabled: bool = 10,
                 ctx1_enabled: bool = 9,
                 ctx0_enabled: bool = 8,
@@ -376,7 +376,7 @@ device_driver::implement_device! {
                 type ByteOrder = LE;
                 const ADDRESS: u8 = 0x03;
                 const SIZE_BITS: usize = 16;
-                const RESET_VALUE: u16 = 0x0083;
+                const RESET_VALUE: [u8] = [0x83, 0x00];
 
                 internal_reference_enabled: bool = 13,
                 prox_engine_bias_current_enabled: bool = 12,
@@ -603,7 +603,7 @@ device_driver::implement_device! {
                 type ByteOrder = LE;
                 const ADDRESS: u8 = 0x95;
                 const SIZE_BITS: usize = 16;
-                const RESET_VALUE: u16 = 0x558;
+                const RESET_VALUE: [u8] = [0x58, 0x05];
 
                 value: u16 = 0..16,
             },
@@ -613,7 +613,7 @@ device_driver::implement_device! {
                 type ByteOrder = LE;
                 const ADDRESS: u8 = 0x95;
                 const SIZE_BITS: usize = 16;
-                const RESET_VALUE: u16 = 0x552;
+                const RESET_VALUE: [u8] = [0x52, 0x05];
 
                 value: u16 = 0..16,
             },
