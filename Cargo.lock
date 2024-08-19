@@ -3,6 +3,12 @@
 version = 3
 
 [[package]]
+name = "array-concat"
+version = "0.5.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "68b4d2c47ea522f4135657904891e533727daca3d2d852f29f5e4cc50960c77c"
+
+[[package]]
 name = "bitflags"
 version = "1.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -172,6 +178,7 @@ dependencies = [
 name = "iqs323-driver"
 version = "0.1.0"
 dependencies = [
+ "array-concat",
  "cfg-if",
  "defmt",
  "device-driver",

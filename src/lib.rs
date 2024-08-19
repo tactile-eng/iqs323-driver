@@ -3,9 +3,12 @@
 
 //! An embedded async driver for the IQS323 capacitive/inductive sensing controller.
 
+use array_concat::concat_arrays;
 use bitvec::array::BitArray;
 pub use device_driver::{bitvec, AddressableDevice, AsyncRegisterDevice, Register};
 use embedded_hal::digital::{self, InputPin};
+use embedded_hal::i2c::Operation;
+use embedded_hal_async::delay::DelayNs;
 use embedded_hal_async::digital::Wait;
 use embedded_hal_async::i2c::{self, I2c};
 
@@ -16,6 +19,7 @@ const ADDR: u8 = 0x44;
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub enum Error<D: i2c::Error, P: digital::Error> {
+    Reset,
     Io(P),
     I2c(D),
 }
@@ -62,6 +66,197 @@ impl<D: I2c, P: InputPin> Iqs323<D, P> {
     }
 }
 
+impl<D: I2c, P: Wait> Iqs323<D, P> {
+    pub async fn reset<T: DelayNs>(
+        &mut self,
+        delay: &mut T,
+    ) -> Result<(), Error<D::Error, P::Error>> {
+        while !self
+            .sys_info()
+            .system_status()
+            .read_async()
+            .await?
+            .reset_event()
+        {
+            self.sys_control()
+                .control()
+                .write_async(|w| w.trigger_soft_reset(true))
+                .await?;
+            delay.delay_ms(100).await;
+        }
+
+        Ok(())
+    }
+
+    pub async fn ack_reset(&mut self) -> Result<(), Error<D::Error, P::Error>> {
+        self.sys_control()
+            .control()
+            .modify_async(|w| w.ack_reset(true))
+            .await
+    }
+
+    pub async fn setup(&mut self, setup: &AddressedSetup) -> Result<(), Error<D::Error, P::Error>> {
+        self.rdy.wait_for_low().await.map_err(Error::Io)?;
+        self.i2c
+            .transaction(
+                ADDR,
+                &mut [
+                    Operation::Write(&setup.sensors[0]),
+                    Operation::Write(&setup.sensors[1]),
+                    Operation::Write(&setup.sensors[2]),
+                    Operation::Write(&setup.channels[0]),
+                    Operation::Write(&setup.channels[1]),
+                    Operation::Write(&setup.channels[2]),
+                    Operation::Write(&setup.slider),
+                    Operation::Write(&setup.gesture),
+                    Operation::Write(&setup.filter_betas),
+                    Operation::Write(&setup.system_control),
+                    Operation::Write(&setup.general),
+                    Operation::Write(&setup.i2c_settings),
+                ],
+            )
+            .await
+            .map_err(Error::I2c)?;
+        self.rdy.wait_for_high().await.map_err(Error::Io)
+    }
+
+    pub async fn read_setup(&mut self) -> Result<Setup, Error<D::Error, P::Error>> {
+        let mut setup = Setup::default();
+        let (s0, s1, s2) = match &mut setup.sensors {
+            [ref mut s0, ref mut s1, ref mut s2] => (s0, s1, s2),
+        };
+        let (c0, c1, c2) = match &mut setup.channels {
+            [ref mut c0, ref mut c1, ref mut c2] => (c0, c1, c2),
+        };
+
+        self.rdy.wait_for_low().await.map_err(Error::Io)?;
+        self.i2c
+            .transaction(
+                ADDR,
+                &mut [
+                    Operation::Write(&[0x30]),
+                    Operation::Read(s0),
+                    Operation::Write(&[0x40]),
+                    Operation::Read(s1),
+                    Operation::Write(&[0x50]),
+                    Operation::Read(s2),
+                    Operation::Write(&[0x60]),
+                    Operation::Read(c0),
+                    Operation::Write(&[0x70]),
+                    Operation::Read(c1),
+                    Operation::Write(&[0x80]),
+                    Operation::Read(c2),
+                    Operation::Write(&[0x90]),
+                    Operation::Read(&mut setup.slider),
+                    Operation::Write(&[0xa0]),
+                    Operation::Read(&mut setup.gesture),
+                    Operation::Write(&[0xb0]),
+                    Operation::Read(&mut setup.filter_betas),
+                    Operation::Write(&[0xc0]),
+                    Operation::Read(&mut setup.system_control),
+                    Operation::Write(&[0xd0]),
+                    Operation::Read(&mut setup.general),
+                    Operation::Write(&[0xe0]),
+                    Operation::Read(&mut setup.i2c_settings),
+                ],
+            )
+            .await
+            .map_err(Error::I2c)?;
+        self.rdy.wait_for_high().await.map_err(Error::Io)?;
+
+        Ok(setup)
+    }
+
+    pub async fn read_sys_info(&mut self) -> Result<SysInfo, Error<D::Error, P::Error>> {
+        let mut buf = [0; 18];
+        self.rdy.wait_for_low().await.map_err(Error::Io)?;
+        self.i2c
+            .write_read(ADDR, &[0x10], &mut buf)
+            .await
+            .map_err(Error::I2c)?;
+        self.rdy.wait_for_high().await.map_err(Error::Io)?;
+
+        let mut system_status = sys_info::SystemStatus::ZERO;
+        system_status
+            .bits_mut()
+            .as_raw_mut_slice()
+            .copy_from_slice(&buf[0..2]);
+        let system_status = system_status.into_r();
+
+        if system_status.reset_event() {
+            return Err(Error::Reset);
+        }
+
+        let mut gestures = sys_info::Gestures::ZERO;
+        gestures
+            .bits_mut()
+            .as_raw_mut_slice()
+            .copy_from_slice(&buf[2..4]);
+        let gestures = gestures.into_r();
+
+        let mut slider_position = sys_info::SliderPosition::ZERO;
+        slider_position
+            .bits_mut()
+            .as_raw_mut_slice()
+            .copy_from_slice(&buf[4..6]);
+        let slider_position = slider_position.into_r();
+
+        let mut ch0_filtered_counts = sys_info::Ch0FilteredCounts::ZERO;
+        ch0_filtered_counts
+            .bits_mut()
+            .as_raw_mut_slice()
+            .copy_from_slice(&buf[6..8]);
+        let ch0_filtered_counts = ch0_filtered_counts.into_r();
+
+        let mut ch0_lta = sys_info::Ch0Lta::ZERO;
+        ch0_lta
+            .bits_mut()
+            .as_raw_mut_slice()
+            .copy_from_slice(&buf[8..10]);
+        let ch0_lta = ch0_lta.into_r();
+
+        let mut ch1_filtered_counts = sys_info::Ch1FilteredCounts::ZERO;
+        ch1_filtered_counts
+            .bits_mut()
+            .as_raw_mut_slice()
+            .copy_from_slice(&buf[10..12]);
+        let ch1_filtered_counts = ch1_filtered_counts.into_r();
+
+        let mut ch1_lta = sys_info::Ch1Lta::ZERO;
+        ch1_lta
+            .bits_mut()
+            .as_raw_mut_slice()
+            .copy_from_slice(&buf[12..14]);
+        let ch1_lta = ch1_lta.into_r();
+
+        let mut ch2_filtered_counts = sys_info::Ch2FilteredCounts::ZERO;
+        ch2_filtered_counts
+            .bits_mut()
+            .as_raw_mut_slice()
+            .copy_from_slice(&buf[14..16]);
+        let ch2_filtered_counts = ch2_filtered_counts.into_r();
+
+        let mut ch2_lta = sys_info::Ch2Lta::ZERO;
+        ch2_lta
+            .bits_mut()
+            .as_raw_mut_slice()
+            .copy_from_slice(&buf[16..18]);
+        let ch2_lta = ch2_lta.into_r();
+
+        Ok(SysInfo {
+            system_status,
+            gestures,
+            slider_position,
+            ch0_filtered_counts,
+            ch0_lta,
+            ch1_filtered_counts,
+            ch1_lta,
+            ch2_filtered_counts,
+            ch2_lta,
+        })
+    }
+}
+
 impl<D, P> AddressableDevice for Iqs323<D, P> {
     type AddressType = u8;
 }
@@ -77,7 +272,8 @@ impl<D: I2c, P: Wait> AsyncRegisterDevice for Iqs323<D, P> {
         const { core::assert!(SIZE_BYTES == 2) };
         let buf = [address, data.as_raw_slice()[0], data.as_raw_slice()[1]];
         self.rdy.wait_for_low().await.map_err(Error::Io)?;
-        self.i2c.write(ADDR, &buf).await.map_err(Error::I2c)
+        self.i2c.write(ADDR, &buf).await.map_err(Error::I2c)?;
+        self.rdy.wait_for_high().await.map_err(Error::Io)
     }
 
     async fn read_register<const SIZE_BYTES: usize>(
@@ -89,7 +285,8 @@ impl<D: I2c, P: Wait> AsyncRegisterDevice for Iqs323<D, P> {
         self.i2c
             .write_read(ADDR, &[address], data.as_raw_mut_slice())
             .await
-            .map_err(Error::I2c)
+            .map_err(Error::I2c)?;
+        self.rdy.wait_for_high().await.map_err(Error::Io)
     }
 }
 
@@ -902,4 +1099,77 @@ cfg_if::cfg_if! {
             Channel2 = 0x4b4,
         }
     }
+}
+
+#[derive(Default, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
+pub struct Setup {
+    pub sensors: [[u8; 20]; 3],
+    pub channels: [[u8; 8]; 3],
+    pub slider: [u8; 18],
+    pub gesture: [u8; 14],
+    pub filter_betas: [u8; 10],
+    pub system_control: [u8; 12],
+    pub general: [u8; 10],
+    pub i2c_settings: [u8; 1],
+}
+
+impl Setup {
+    pub const fn addressed(self) -> AddressedSetup {
+        AddressedSetup::from_setup(self)
+    }
+}
+
+#[derive(Default, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
+pub struct AddressedSetup {
+    sensors: [[u8; 21]; 3],
+    channels: [[u8; 9]; 3],
+    slider: [u8; 19],
+    gesture: [u8; 15],
+    filter_betas: [u8; 11],
+    system_control: [u8; 13],
+    general: [u8; 11],
+    i2c_settings: [u8; 2],
+}
+
+impl AddressedSetup {
+    pub const fn from_setup(setup: Setup) -> Self {
+        AddressedSetup {
+            sensors: [
+                concat_arrays!([0x30], setup.sensors[0]),
+                concat_arrays!([0x40], setup.sensors[1]),
+                concat_arrays!([0x50], setup.sensors[2]),
+            ],
+            channels: [
+                concat_arrays!([0x60], setup.channels[0]),
+                concat_arrays!([0x70], setup.channels[1]),
+                concat_arrays!([0x80], setup.channels[2]),
+            ],
+            slider: concat_arrays!([0x90], setup.slider),
+            gesture: concat_arrays!([0xa0], setup.gesture),
+            filter_betas: concat_arrays!([0xb0], setup.filter_betas),
+            system_control: concat_arrays!([0xc0], setup.system_control),
+            general: concat_arrays!([0xd0], setup.general),
+            i2c_settings: concat_arrays!([0xe0], setup.i2c_settings),
+        }
+    }
+}
+
+impl From<Setup> for AddressedSetup {
+    fn from(value: Setup) -> Self {
+        Self::from_setup(value)
+    }
+}
+
+pub struct SysInfo {
+    pub system_status: sys_info::system_status::R,
+    pub gestures: sys_info::gestures::R,
+    pub slider_position: sys_info::slider_position::R,
+    pub ch0_filtered_counts: sys_info::ch_0_filtered_counts::R,
+    pub ch0_lta: sys_info::ch_0_lta::R,
+    pub ch1_filtered_counts: sys_info::ch_1_filtered_counts::R,
+    pub ch1_lta: sys_info::ch_1_lta::R,
+    pub ch2_filtered_counts: sys_info::ch_2_filtered_counts::R,
+    pub ch2_lta: sys_info::ch_2_lta::R,
 }
