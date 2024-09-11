@@ -6,7 +6,7 @@
 use array_concat::concat_arrays;
 use bitvec::array::BitArray;
 pub use device_driver::{bitvec, AddressableDevice, AsyncRegisterDevice, Register};
-use embedded_hal::digital::{self, InputPin};
+use embedded_hal::digital::{self, InputPin, OutputPin};
 use embedded_hal::i2c::Operation;
 use embedded_hal_async::delay::DelayNs;
 use embedded_hal_async::digital::Wait;
@@ -16,10 +16,11 @@ pub mod i2c_settings;
 
 const ADDR: u8 = 0x44;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub enum Error<D: i2c::Error, P: digital::Error> {
     Reset,
+    I2cLockup,
     Io(P),
     I2c(D),
 }
@@ -168,13 +169,17 @@ impl<D: I2c, P: Wait> Iqs323<D, P> {
     }
 
     pub async fn read_sys_info(&mut self) -> Result<SysInfo, Error<D::Error, P::Error>> {
-        let mut buf = [0; 18];
+        let mut buf = [0; 19];
         self.rdy.wait_for_low().await.map_err(Error::Io)?;
         self.i2c
             .write_read(ADDR, &[0x10], &mut buf)
             .await
             .map_err(Error::I2c)?;
         self.rdy.wait_for_high().await.map_err(Error::Io)?;
+
+        if buf[18] != 0xee {
+            return Err(Error::I2cLockup);
+        }
 
         let mut system_status = sys_info::SystemStatus::ZERO;
         system_status
@@ -254,6 +259,17 @@ impl<D: I2c, P: Wait> Iqs323<D, P> {
             ch2_filtered_counts,
             ch2_lta,
         })
+    }
+}
+
+impl<D: I2c, P: Wait + OutputPin> Iqs323<D, P> {
+    pub async fn hard_reset<T: DelayNs>(&mut self, delay: &mut T) -> Result<(), P::Error> {
+        self.rdy.wait_for_high().await?;
+        self.rdy.set_low()?;
+        delay.delay_us(1).await;
+        self.rdy.set_high()?;
+        delay.delay_ms(100).await;
+        Ok(())
     }
 }
 
