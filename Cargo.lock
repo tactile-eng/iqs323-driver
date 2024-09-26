@@ -75,8 +75,9 @@ dependencies = [
 
 [[package]]
 name = "device-driver"
-version = "0.6.0"
-source = "git+https://github.com/diondokter/device-driver.git#397ce01e2b34699e0a5ae7a1c825b3d98ed8d7a5"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "14d19add61e3771b821cffda4a8c833a31ce2bbab8f85268a06c326f46a90f40"
 dependencies = [
  "bitvec",
  "device-driver-macros",
@@ -88,8 +89,9 @@ dependencies = [
 
 [[package]]
 name = "device-driver-generation"
-version = "0.6.0"
-source = "git+https://github.com/diondokter/device-driver.git#397ce01e2b34699e0a5ae7a1c825b3d98ed8d7a5"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a5c4b133511a7d6c62bbd6a446dc7f5b799bbc4d89af634bfde75095d5aa62b7"
 dependencies = [
  "convert_case",
  "indexmap",
@@ -102,8 +104,9 @@ dependencies = [
 
 [[package]]
 name = "device-driver-macros"
-version = "0.6.0"
-source = "git+https://github.com/diondokter/device-driver.git#397ce01e2b34699e0a5ae7a1c825b3d98ed8d7a5"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7f3172b490fa376f3a7964df70fa97a7df21eec753f493e3052f2f7cfd9f9edb"
 dependencies = [
  "device-driver-generation",
  "proc-macro2",
