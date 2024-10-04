@@ -236,6 +236,7 @@ device_driver::create_device!(
                 type Access = ReadWrite;
                 const ADDRESS = 0x01;
                 const SIZE_BITS = 16;
+                const RESET_VALUE = 0x007f;
 
                 period: uint = 8..16,
                 frac: uint = 0..8,
@@ -274,7 +275,7 @@ device_driver::create_device!(
                 type Access = ReadWrite;
                 const ADDRESS = 0x03;
                 const SIZE_BITS = 16;
-                const RESET_VALUE = [0x83, 0x00];
+                const RESET_VALUE = 0x0083;
 
                 internal_reference_enabled: bool = 13,
                 prox_engine_bias_current_enabled: bool = 12,
@@ -481,7 +482,7 @@ device_driver::create_device!(
                 type Access = ReadWrite;
                 const ADDRESS = 0x95;
                 const SIZE_BITS = 16;
-                const RESET_VALUE = [0x58, 0x05];
+                const RESET_VALUE = 0x0558;
                 const ALLOW_ADDRESS_OVERLAP = true;
 
                 value: uint = 0..16,
@@ -491,7 +492,7 @@ device_driver::create_device!(
                 type Access = ReadWrite;
                 const ADDRESS = 0x95;
                 const SIZE_BITS = 16;
-                const RESET_VALUE = [0x52, 0x05];
+                const RESET_VALUE = 0x0552;
                 const ALLOW_ADDRESS_OVERLAP = true;
 
                 value: uint = 0..16,

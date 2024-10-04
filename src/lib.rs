@@ -129,14 +129,10 @@ impl<D: I2c, P: Wait> Iqs323<D, P> {
         }
 
         let (s0, s1, s2) = match &mut setup.sensors {
-            [ref mut s0, ref mut s1, ref mut s2] => {
-                (as_bytes_mut(s0), as_bytes_mut(s1), as_bytes_mut(s2))
-            }
+            [s0, s1, s2] => (as_bytes_mut(s0), as_bytes_mut(s1), as_bytes_mut(s2)),
         };
         let (c0, c1, c2) = match &mut setup.channels {
-            [ref mut c0, ref mut c1, ref mut c2] => {
-                (as_bytes_mut(c0), as_bytes_mut(c1), as_bytes_mut(c2))
-            }
+            [c0, c1, c2] => (as_bytes_mut(c0), as_bytes_mut(c1), as_bytes_mut(c2)),
         };
 
         self.rdy.wait_for_low().await.map_err(Error::Io)?;
@@ -242,10 +238,11 @@ impl<'a, D: I2c, P: Wait> device_driver::AsyncRegisterInterface for &'a mut Iqs3
     async fn write_register(
         &mut self,
         address: Self::AddressType,
+        _size_bits: u32,
         data: &[u8],
     ) -> Result<(), Self::Error> {
         const MAX_LEN: usize = 3;
-        assert!(data.len() <= MAX_LEN - 1);
+        assert!(data.len() < MAX_LEN);
         let mut buf = heapless::Vec::<u8, MAX_LEN>::new();
         let _ = buf.push(address);
         let _ = buf.extend_from_slice(data);
@@ -257,6 +254,7 @@ impl<'a, D: I2c, P: Wait> device_driver::AsyncRegisterInterface for &'a mut Iqs3
     async fn read_register(
         &mut self,
         address: Self::AddressType,
+        _size_bits: u32,
         data: &mut [u8],
     ) -> Result<(), Self::Error> {
         self.rdy.wait_for_low().await.map_err(Error::Io)?;
