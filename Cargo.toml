@@ -19,7 +19,7 @@ categories = ["no-std", "embedded", "asynchronous", "hardware-support"]
 array-concat = "0.5.3"
 cfg-if = "1.0.0"
 defmt = { version = "0.3", optional = true }
-device-driver = { git = "https://github.com/diondokter/device-driver.git", rev = "d487ac42c60b88e0487607b95a78578bf971a00d" }
+device-driver = "1.0.1"
 embedded-hal = "1.0.0"
 embedded-hal-async = "1.0.0"
 heapless = "0.8.0"

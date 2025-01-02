@@ -191,20 +191,20 @@ impl<D: I2c, P: Wait> Iqs323<D, P> {
             slice.try_into().unwrap()
         }
 
-        let system_status = regs::SystemStatus::from(as_array(&buf[0..2]));
+        let system_status = regs::field_sets::SystemStatus::from(as_array(&buf[0..2]));
 
         if system_status.reset_event() {
             return Err(Error::Reset);
         }
 
-        let gestures = regs::Gestures::from(as_array(&buf[2..4]));
-        let slider_position = regs::SliderPosition::from(as_array(&buf[4..6]));
-        let ch0_filtered_counts = regs::Ch0FilteredCounts::from(as_array(&buf[6..8]));
-        let ch0_lta = regs::Ch0Lta::from(as_array(&buf[8..10]));
-        let ch1_filtered_counts = regs::Ch1FilteredCounts::from(as_array(&buf[10..12]));
-        let ch1_lta = regs::Ch1Lta::from(as_array(&buf[12..14]));
-        let ch2_filtered_counts = regs::Ch2FilteredCounts::from(as_array(&buf[14..16]));
-        let ch2_lta = regs::Ch2Lta::from(as_array(&buf[16..18]));
+        let gestures = regs::field_sets::Gestures::from(as_array(&buf[2..4]));
+        let slider_position = regs::field_sets::SliderPosition::from(as_array(&buf[4..6]));
+        let ch0_filtered_counts = regs::field_sets::Ch0FilteredCounts::from(as_array(&buf[6..8]));
+        let ch0_lta = regs::field_sets::Ch0Lta::from(as_array(&buf[8..10]));
+        let ch1_filtered_counts = regs::field_sets::Ch1FilteredCounts::from(as_array(&buf[10..12]));
+        let ch1_lta = regs::field_sets::Ch1Lta::from(as_array(&buf[12..14]));
+        let ch2_filtered_counts = regs::field_sets::Ch2FilteredCounts::from(as_array(&buf[14..16]));
+        let ch2_lta = regs::field_sets::Ch2Lta::from(as_array(&buf[16..18]));
 
         Ok(SysInfo {
             system_status,
@@ -335,13 +335,13 @@ impl From<Setup> for AddressedSetup {
 }
 
 pub struct SysInfo {
-    pub system_status: regs::SystemStatus,
-    pub gestures: regs::Gestures,
-    pub slider_position: regs::SliderPosition,
-    pub ch0_filtered_counts: regs::Ch0FilteredCounts,
-    pub ch0_lta: regs::Ch0Lta,
-    pub ch1_filtered_counts: regs::Ch1FilteredCounts,
-    pub ch1_lta: regs::Ch1Lta,
-    pub ch2_filtered_counts: regs::Ch2FilteredCounts,
-    pub ch2_lta: regs::Ch2Lta,
+    pub system_status: regs::field_sets::SystemStatus,
+    pub gestures: regs::field_sets::Gestures,
+    pub slider_position: regs::field_sets::SliderPosition,
+    pub ch0_filtered_counts: regs::field_sets::Ch0FilteredCounts,
+    pub ch0_lta: regs::field_sets::Ch0Lta,
+    pub ch1_filtered_counts: regs::field_sets::Ch1FilteredCounts,
+    pub ch1_lta: regs::field_sets::Ch1Lta,
+    pub ch2_filtered_counts: regs::field_sets::Ch2FilteredCounts,
+    pub ch2_lta: regs::field_sets::Ch2Lta,
 }
